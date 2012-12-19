@@ -37,17 +37,17 @@ public class Main {
 		ns.persist();
 */
 		
-		VectorQuantizer.L = 0.8;
+		VectorQuantizer.L = 0.4;
 		ImageInfo ii = null;
-		for(int i=0; i<100; i++){
+		for(int i=0; i<1000; i++){
 			CoderAlg c = new CoderAlg("test1.jpg", true);
 			ii = c.processAlg();
 			
 			if(VectorQuantizer.L > 0.15){
-				VectorQuantizer.L -= 0.005;
+				VectorQuantizer.L -= 0.0013;
 			} 
 			else if(VectorQuantizer.L > 0.01){
-				VectorQuantizer.L -= 0.0006;
+				VectorQuantizer.L -= 0.0001;
 			} else if(VectorQuantizer.L > 0.0005){
 				VectorQuantizer.L -= 0.00005;
 			}

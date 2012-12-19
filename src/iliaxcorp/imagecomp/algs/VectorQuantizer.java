@@ -59,33 +59,16 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 
 			int minInx = 0;
 			double minVal = Double.MAX_VALUE;
-			List<Integer> minIndexes = new ArrayList<Integer>();
 			for (int j = 0; j < ns.getNeuronsCount(); j++) {
 				Neuron n = ns.getNeuronByIndex(j);
 				double diff = getDiff(n.getLinks(), cb.block);
 				if (diff < minVal) {
 					minVal = diff;
 					minInx = j;
-					minIndexes.add(minInx);
 				}
 			}
 			if (study) {
-				if (!minIndexes.isEmpty()) {
-					minInx = minIndexes.get(r.nextInt(minIndexes.size()));
-					for (int k = minIndexes.size() - 1; k >= 0; k--) {
-						Neuron kn = ns.getNeuronByIndex(minIndexes.get(k));
-						if (kn.getActive() > 0) {
-							kn.setActive(kn.getActive() - 1);
-						} else {
-							minInx = minIndexes.get(k);
-							break;
-						}
-					}
-				}
-
 				Neuron n = ns.getNeuronByIndex(minInx);
-				minVal = getDiff(n.getLinks(), cb.block);
-				n.setActive(Neuron.SLEEP_COUNT);
 				List<Integer> newIndexes = new ArrayList<Integer>();
 				for (int l = 0; l < CoderAlg.BLOCK_SIZE * CoderAlg.BLOCK_SIZE; l++) {
 					int oldVal = n.getLinkColor(l);
@@ -96,8 +79,10 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 				n.getLinks().addAll(newIndexes);
 				ns.setNeuron(minInx, n);
 				double diffAft = getDiff(n.getLinks(), cb.block);
-				Main.print(minInx + ") " + minVal + "  ---  " + diffAft
-						+ " iter = " + Main.iteration);
+				if(diffAft != 0){
+//					Main.print(minInx + ") " + minVal + "  ---  " + diffAft
+//							+ " iter = " + Main.iteration);
+				}
 				if (diffAft > minVal) {
 					Main.print("ololo");
 					System.exit(0);

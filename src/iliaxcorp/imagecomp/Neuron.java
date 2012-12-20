@@ -46,6 +46,10 @@ public class Neuron implements Serializable {
 		return links;
 	}
 	
+	public void setLinks(List<Integer> links) {
+		this.links = links;
+	}
+	
 	@Override
 	public String toString() {
 		return links.toString();

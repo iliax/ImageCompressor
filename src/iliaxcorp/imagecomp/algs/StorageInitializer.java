@@ -17,7 +17,7 @@ public class StorageInitializer extends Alg<NeuronStorage> {
 			Neuron n = new Neuron();
 			
 			for(int j=0; j < blockSize*blockSize; j++){
-				n.setLinkColor(j, ( rand.nextInt(max)) + 5000);
+				n.setLinkColor(j, ( (-1)*rand.nextInt(max)) - 5000);
 			}
 			
 			ns.setNeuron(i, n);

@@ -23,7 +23,7 @@ public class Image {
 	}
 	
 	public Color getColorAt(int x, int y){
-		return new Color((-1)*img.getIntColor(x, y));
+		return new Color(img.getIntColor(x, y));
 	}
 	
 	public int getW(){
@@ -35,9 +35,6 @@ public class Image {
 	}
 	
 	public void setColorAt(int x, int y, int color){
-		if(color >= 0){
-			color = (-1)*color;
-		}
 		img.setIntColor(x, y, color);
 	}
 	

@@ -7,10 +7,12 @@ import java.util.Random;
 
 import main.Main;
 
+import iliaxcorp.imagecomp.Color;
 import iliaxcorp.imagecomp.ColoredBlock;
 import iliaxcorp.imagecomp.Neuron;
 import iliaxcorp.imagecomp.persistance.NeuronStorage;
 import iliaxcorp.imagecomp.utils.P;
+import iliaxcorp.imagecomp.utils.P3;
 
 public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 
@@ -40,22 +42,22 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 		Random r = new Random(System.currentTimeMillis());
 		for (int i = 0; i < blocks.size(); i++) {
 			ColoredBlock cb = blocks.get(i);
-			//
-			// if(study==true){
-			// if(nnn < ns.getNeuronsCount()){
-			// Neuron n = ns.getNeuronByIndex(nnn);
-			// n.getLinks().clear();
-			// n.getLinks().addAll(cb.block);
-			// indexes.add(nnn++);
-			// }else {
-			// int nnnrand = r.nextInt(ns.getNeuronsCount()-1);
-			// Neuron n = ns.getNeuronByIndex(nnnrand);
-			// n.getLinks().clear();
-			// n.getLinks().addAll(cb.block);
-			// indexes.add(nnnrand);
-			// }
-			// continue;
-			// }
+//			
+//			 if(study==true){
+//			 if(nnn < ns.getNeuronsCount()){
+//			 Neuron n = ns.getNeuronByIndex(nnn);
+//			 n.getLinks().clear();
+//			 n.getLinks().addAll(cb.block);
+//			 indexes.add(nnn++);
+//			 }else {
+//			 int nnnrand = r.nextInt(ns.getNeuronsCount()-1);
+//			 Neuron n = ns.getNeuronByIndex(nnnrand);
+//			 n.getLinks().clear();
+//			 n.getLinks().addAll(cb.block);
+//			 indexes.add(nnnrand);
+//			 }
+//			 continue;
+//			 }
 
 			int minInx = 0;
 			double minVal = Double.MAX_VALUE;
@@ -72,22 +74,17 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 				List<Integer> newIndexes = new ArrayList<Integer>();
 				for (int l = 0; l < CoderAlg.BLOCK_SIZE * CoderAlg.BLOCK_SIZE; l++) {
 					int oldVal = n.getLinkColor(l);
-					int newVal = (int) (oldVal + L * (cb.block.get(l) - oldVal));
+					//int newVal = (int) (oldVal + L * (cb.block.get(l) - oldVal));
+					int newVal = changeValue(cb.block.get(l), oldVal);
 					newIndexes.add(newVal);
 				}
-				n.getLinks().clear();
-				n.getLinks().addAll(newIndexes);
+				n.setLinks(newIndexes);
 				ns.setNeuron(minInx, n);
-				double diffAft = getDiff(n.getLinks(), cb.block);
-				if(diffAft != 0){
-//					Main.print(minInx + ") " + minVal + "  ---  " + diffAft
-//							+ " iter = " + Main.iteration);
-				}
-				if (diffAft > minVal) {
-					Main.print("ololo");
-					System.exit(0);
-				}
-
+//				double diffAft = getDiff(n.getLinks(), cb.block);
+//				if (diffAft > minVal) {
+//					Main.print("ololo");
+//					System.exit(0);
+//				}
 			}
 			indexes.add(minInx);
 		}
@@ -96,42 +93,33 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 		return new P<NeuronStorage, List<Integer>>(ns, indexes);
 	}
 
-	private double getDiff(List<Integer> links, List<Integer> block) {
-		double sum = 0;
+	int changeValue(int targ, int old){
+		P3<Integer, Integer, Integer>  t = Color.getRGBfromInt(targ);
+		P3<Integer, Integer, Integer>  o = Color.getRGBfromInt(old);
+		int d1 = t.a - o.a;
+		int d2 = t.b - o.b;
+		int d3 = t.c - o.c;
+		
+		return Color.getIntFromRGB((int) (o.a + L*d1), (int) (o.b +L*d2), (int) (o.c + L*d3));
+	}
+	
+	int getDiff(List<Integer> links, List<Integer> block) {
+		int sum = 0;
 		for (int i = 0; i < CoderAlg.BLOCK_SIZE; i++) {
-			double t = ((double) (links.get(i) - block.get(i)));
-			sum += (t * t);
+			double diff = getDiffBetweenColors(links.get(i), block.get(i));
+			sum += diff;
 		}
 		return sum;
-
-		/*
-		 * List<Double> l1= new ArrayList<Double>(); double l1ololo =
-		 * getOLOLO(links); List<Double> l2= new ArrayList<Double>(); double
-		 * l2ololo = getOLOLO(block);
-		 * 
-		 * for(int i=0; i<CoderAlg.BLOCK_SIZE; i++){ double l1i =
-		 * ((double)links.get(i))/l1ololo; l1.add(l1i); double l2i =
-		 * ((double)block.get(i))/l2ololo; l2.add(l2i); } return
-		 * getDiffDouble(l1, l2);
-		 */
 	}
 
-	double getOLOLO(List<Integer> lst) {
-		double sum = 0;
-		for (int i = 0; i < CoderAlg.BLOCK_SIZE; i++) {
-			int l = lst.get(i);
-			sum += (double) (l * l);
-		}
-		return Math.sqrt(sum);
+	int getDiffBetweenColors(int c1, int c2){
+		P3<Integer, Integer, Integer>  p1 = Color.getRGBfromInt(c1);
+		P3<Integer, Integer, Integer>  p2 = Color.getRGBfromInt(c2);
+		int d1 = p1.a - p2.a;
+		int d2 = p1.b - p2.b;
+		int d3 = p1.c - p2.c;
+		return d1*d1 + d2*d2 + d3*d3;
 	}
 
-	double getDiffDouble(List<Double> links, List<Double> block) {
-		double sum = 0;
-		// Евклидова мера
-		for (int i = 0; i < CoderAlg.BLOCK_SIZE; i++) {
-			sum += Math.pow(links.get(i) - block.get(i), 2);
-		}
-		return Math.sqrt(sum);
-	}
 
 }

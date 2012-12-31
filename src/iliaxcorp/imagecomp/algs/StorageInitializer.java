@@ -2,11 +2,12 @@ package iliaxcorp.imagecomp.algs;
 
 import java.util.Random;
 
+import iliaxcorp.imagecomp.Color;
 import iliaxcorp.imagecomp.Neuron;
 import iliaxcorp.imagecomp.persistance.InMemoryNeuronStorage;
 import iliaxcorp.imagecomp.persistance.NeuronStorage;
 
-public class StorageInitializer extends Alg<NeuronStorage> {
+public class StorageInitializer extends Alg<NeuronStorage, Void> {
 
 	private NeuronStorage ns = new InMemoryNeuronStorage();
 	
@@ -17,7 +18,7 @@ public class StorageInitializer extends Alg<NeuronStorage> {
 			Neuron n = new Neuron();
 			
 			for(int j=0; j < blockSize*blockSize; j++){
-				n.setLinkColor(j, ( (-1)*rand.nextInt(max)) - 5000);
+				n.setLinkColor(j, ( new Color((-1)*rand.nextInt(max) - 5000)));
 			}
 			
 			ns.setNeuron(i, n);
@@ -25,7 +26,7 @@ public class StorageInitializer extends Alg<NeuronStorage> {
 	}
 	
 	@Override
-	public NeuronStorage processAlg() {
+	public NeuronStorage processAlg(Void _v) {
 		return ns;
 	}
 

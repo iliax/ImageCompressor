@@ -11,25 +11,25 @@ public class Neuron implements Serializable {
 	
 	private static final long serialVersionUID = 8492166129539633455L;
 
-	static final int DEFAULT_LINKS_COUNT = 16;
+	private static final int DEFAULT_LINKS_COUNT = 16;
 	
-	private List<Integer> links;
+	private List<Color> links;
 	
 	private int active = 0;
 	
 	public Neuron() {
-		links = new ArrayList<Integer>(DEFAULT_LINKS_COUNT);
+		links = new ArrayList<Color>(DEFAULT_LINKS_COUNT);
 	}
 	
 	public Neuron(int aLinksCount){
-		links = new ArrayList<Integer>(aLinksCount);
+		links = new ArrayList<Color>(aLinksCount);
 	}
 	
-	public int getLinkColor(int linkNumber){
+	public Color getLinkColor(int linkNumber){
 		return links.get(linkNumber);
 	}
 	
-	public void setLinkColor(int linkNumber, int color){
+	public void setLinkColor(int linkNumber, Color color){
 		if (linkNumber >= links.size()) {
 			for (int i = 0; i < linkNumber - links.size() + 1; i++) {
 				links.add(null);
@@ -42,11 +42,11 @@ public class Neuron implements Serializable {
 		return links.size();
 	}
 	
-	public List<Integer> getLinks(){
+	public List<Color> getLinks(){
 		return links;
 	}
 	
-	public void setLinks(List<Integer> links) {
+	public void setLinks(List<Color> links) {
 		this.links = links;
 	}
 	

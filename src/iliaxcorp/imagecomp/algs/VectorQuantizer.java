@@ -14,9 +14,9 @@ import iliaxcorp.imagecomp.persistance.NeuronStorage;
 import iliaxcorp.imagecomp.utils.P;
 import iliaxcorp.imagecomp.utils.P3;
 
-public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
+public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>, Void> {
 
-	public static double L = 0.1;
+	private double L;
 
 	private NeuronStorage ns;
 
@@ -25,24 +25,25 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 	private boolean study;
 
 	public VectorQuantizer(NeuronStorage aNs, List<ColoredBlock> aBlocks,
-			boolean aStudy) {
+			boolean aStudy, double LL) {
 		ns = aNs;
 		blocks = aBlocks;
 		study = aStudy;
+		L = LL;
 	}
 
 	@Override
-	public P<NeuronStorage, List<Integer>> processAlg() {
+	public P<NeuronStorage, List<Integer>> processAlg(Void _v) {
 
 		Main.print("VectorQuantizer start " + new Date());
 
 		List<Integer> indexes = new ArrayList<Integer>();
 
-		int nnn = 0;
-		Random r = new Random(System.currentTimeMillis());
+//		int nnn = 0;
+//		Random r = new Random(System.currentTimeMillis());
 		for (int i = 0; i < blocks.size(); i++) {
 			ColoredBlock cb = blocks.get(i);
-//			
+			
 //			 if(study==true){
 //			 if(nnn < ns.getNeuronsCount()){
 //			 Neuron n = ns.getNeuronByIndex(nnn);
@@ -59,6 +60,7 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 //			 continue;
 //			 }
 
+			List<Integer> minIndexes = new ArrayList<Integer>();
 			int minInx = 0;
 			double minVal = Double.MAX_VALUE;
 			for (int j = 0; j < ns.getNeuronsCount(); j++) {
@@ -67,16 +69,34 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 				if (diff < minVal) {
 					minVal = diff;
 					minInx = j;
+					minIndexes.add(minInx);
+				}
+				if(minIndexes.size() > 20){
+					minIndexes.clear();
+					minIndexes.add(minInx);
 				}
 			}
 			if (study) {
+				if (!minIndexes.isEmpty()) {
+					for (int k = minIndexes.size() - 1; k >= 0; k--) {
+						Neuron kn = ns.getNeuronByIndex(minIndexes.get(k));
+						if (kn.getActive() > 0) {
+							kn.setActive(kn.getActive() - 1);
+						} else {
+							minInx = minIndexes.get(k);
+							break;
+						}
+					}
+				}
+				
 				Neuron n = ns.getNeuronByIndex(minInx);
-				List<Integer> newIndexes = new ArrayList<Integer>();
+				n.setActive(Neuron.SLEEP_COUNT);
+				List<Color> newIndexes = new ArrayList<Color>();
 				for (int l = 0; l < CoderAlg.BLOCK_SIZE * CoderAlg.BLOCK_SIZE; l++) {
-					int oldVal = n.getLinkColor(l);
+					Color oldColor = n.getLinkColor(l);
 					//int newVal = (int) (oldVal + L * (cb.block.get(l) - oldVal));
-					int newVal = changeValue(cb.block.get(l), oldVal);
-					newIndexes.add(newVal);
+					Color newColor = changeValue(cb.block.get(l), oldColor);
+					newIndexes.add(newColor);
 				}
 				n.setLinks(newIndexes);
 				ns.setNeuron(minInx, n);
@@ -93,17 +113,18 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 		return new P<NeuronStorage, List<Integer>>(ns, indexes);
 	}
 
-	int changeValue(int targ, int old){
-		P3<Integer, Integer, Integer>  t = Color.getRGBfromInt(targ);
-		P3<Integer, Integer, Integer>  o = Color.getRGBfromInt(old);
-		int d1 = t.a - o.a;
-		int d2 = t.b - o.b;
-		int d3 = t.c - o.c;
+	Color changeValue(Color targ, Color old){;
+		int d1 = targ.getRed() - old.getRed();
+		int d2 = targ.getGreen() - old.getGreen();
+		int d3 = targ.getBlue() - old.getBlue();
 		
-		return Color.getIntFromRGB((int) (o.a + L*d1), (int) (o.b +L*d2), (int) (o.c + L*d3));
+		return new Color(
+				(int) (old.getRed() + L*d1), 
+				(int) (old.getGreen() +L*d2), 
+				(int) (old.getBlue() + L*d3));
 	}
 	
-	int getDiff(List<Integer> links, List<Integer> block) {
+	int getDiff(List<Color> links, List<Color> block) {
 		int sum = 0;
 		for (int i = 0; i < CoderAlg.BLOCK_SIZE; i++) {
 			double diff = getDiffBetweenColors(links.get(i), block.get(i));
@@ -112,12 +133,10 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>> {
 		return sum;
 	}
 
-	int getDiffBetweenColors(int c1, int c2){
-		P3<Integer, Integer, Integer>  p1 = Color.getRGBfromInt(c1);
-		P3<Integer, Integer, Integer>  p2 = Color.getRGBfromInt(c2);
-		int d1 = p1.a - p2.a;
-		int d2 = p1.b - p2.b;
-		int d3 = p1.c - p2.c;
+	int getDiffBetweenColors(Color c1, Color c2){
+		int d1 = c1.getRed() - c2.getRed();
+		int d2 = c1.getGreen() - c2.getGreen();
+		int d3 = c1.getBlue() - c2.getBlue();
 		return d1*d1 + d2*d2 + d3*d3;
 	}
 

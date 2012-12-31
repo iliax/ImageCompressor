@@ -4,7 +4,7 @@ import java.util.List;
 
 import iliaxcorp.imagecomp.ColoredBlock;
 
-public class DCT extends Alg<List<ColoredBlock>>{
+public class DCT extends Alg<List<ColoredBlock>, Void>{
 
 	private List<ColoredBlock> blocks;
 	
@@ -13,7 +13,7 @@ public class DCT extends Alg<List<ColoredBlock>>{
 	}
 	
 	@Override
-	public List<ColoredBlock> processAlg() {
+	public List<ColoredBlock> processAlg(Void _v) {
 		//TODO impl!
 		return blocks;
 	}

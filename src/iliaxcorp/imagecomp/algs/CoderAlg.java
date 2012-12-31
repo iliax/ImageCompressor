@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import main.Main;
-
 import iliaxcorp.imagecomp.ColoredBlock;
 import iliaxcorp.imagecomp.Image;
 import iliaxcorp.imagecomp.ImageInfo;
@@ -14,50 +12,58 @@ import iliaxcorp.imagecomp.persistance.NeuronStorage;
 import iliaxcorp.imagecomp.utils.IOUtils;
 import iliaxcorp.imagecomp.utils.P;
 
-public class CoderAlg extends Alg<ImageInfo>{
+public class CoderAlg extends Alg<ImageInfo, Void>{
 
+	public static NeuronStorage ns; //TODO remove this shit
+	
 	private String path;
+	
 	private boolean study;
+	
 	public static final int BLOCK_SIZE = 4;
 	
-	public CoderAlg(String path, boolean study) {
+	private double L = 0.9;
+	
+	public CoderAlg(String path,  double L , boolean study) {
 		this.path = path;
 		this.study = study;
+		this.L = L ;
 	}
 	
 	@Override
-	public ImageInfo processAlg() {
+	public ImageInfo processAlg(Void _v) {
 		Image img = IOUtils.loadImage(path);
 		Vectorization v = new Vectorization(img, BLOCK_SIZE);
-		List<ColoredBlock> cbs =  v.processAlg();
+		List<ColoredBlock> cbs =  v.processAlg(null);
 		
 		DCT dct = new DCT(cbs);
-		List<ColoredBlock> cbs2 = dct.processAlg();
+		List<ColoredBlock> cbs2 = dct.processAlg(null);
 		
-		NeuronStorage ns =new  InMemoryNeuronStorage();
-		if(Main.ns != null){
-			ns = Main.ns;
+		NeuronStorage ns;
+		if(CoderAlg.ns != null){
+			ns = CoderAlg.ns;
 		} else {
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("path", "neuron_store.ser");
-			ns.init(params);
+			ns = new InMemoryNeuronStorage(params);
+			ns.init();
 		}
 		
-		VectorQuantizer vq = new VectorQuantizer(ns, cbs2, study);
-		P<NeuronStorage, List<Integer>> res = vq.processAlg();
+		VectorQuantizer vq = new VectorQuantizer(ns, cbs2, study, L);
+		P<NeuronStorage, List<Integer>> res = vq.processAlg(null);
 		
 		ns = res.a;
 		if(study){
 			ns.persist();
 		}
 		
-		Main.ns = ns;
+		CoderAlg.ns = ns;
 		
 		ImageInfo imgInfo = new ImageInfo();
 		imgInfo.blockSize = BLOCK_SIZE;
 		imgInfo.h = img.getH();
 		imgInfo.w = img.getW();
-		imgInfo.neuronIndexs = res.b;
+		imgInfo.neuronIndexes = res.b;
 		return imgInfo;
 	}
 

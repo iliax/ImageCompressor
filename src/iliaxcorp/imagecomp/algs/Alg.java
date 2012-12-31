@@ -1,7 +1,6 @@
 package iliaxcorp.imagecomp.algs;
 
-public abstract class Alg<T> {
+public abstract class Alg<R, A> {
 
-	public abstract T processAlg();
-	
+	public abstract R processAlg(A arg);
 }

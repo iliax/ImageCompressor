@@ -9,17 +9,27 @@ import iliaxcorp.imagecomp.utils.IOUtils;
 
 public class InMemoryNeuronStorage implements NeuronStorage {
 
-	private List<Neuron> neurons = new ArrayList<Neuron>();
+	private volatile List<Neuron> neurons = new ArrayList<Neuron>();
 
 	private Map<String, String> params;
 
 	public void setParams(Map<String, String> params) {
+		if(params == null){
+			throw new IllegalArgumentException();
+		}
 		this.params = params;
 	}
 	
-	public InMemoryNeuronStorage() {
+	public InMemoryNeuronStorage(Map<String, String> params) {
+		if(params == null){
+			throw new IllegalArgumentException();
+		}
+		this.params = params;
 	}
 
+	public InMemoryNeuronStorage() {
+	}
+	
 	@Override
 	public Neuron getNeuronByIndex(int inx) {
 		return neurons.get(inx);
@@ -41,8 +51,7 @@ public class InMemoryNeuronStorage implements NeuronStorage {
 	}
 
 	@Override
-	public void init(Map<String, String> params) {
-		this.params = params;
+	public void init() {
 		neurons = IOUtils.deserializeObject(params.get("path"));
 	}
 

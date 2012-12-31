@@ -1,7 +1,6 @@
 package iliaxcorp.imagecomp.persistance;
 
 import java.util.List;
-import java.util.Map;
 
 import iliaxcorp.imagecomp.Neuron;
 
@@ -13,7 +12,7 @@ public interface NeuronStorage {
 	
 	abstract public void setNeuron(int indx, Neuron n);
 	
-	abstract public void init(Map<String, String> params);
+	abstract public void init();
 	
 	abstract public List<Neuron> getNeurons();
 	

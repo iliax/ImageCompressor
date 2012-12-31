@@ -16,4 +16,7 @@ public class ImageCompressionException extends RuntimeException {
 		super(mess, cause);
 	}
 	
+	public ImageCompressionException(Exception cause){
+		super(cause);
+	}
 }

@@ -7,7 +7,7 @@ public class ColoredBlock {
 
 	public int blockSize = 4;
 	
-	public List<Integer> block = new ArrayList<Integer>();
+	public List<Color> block = new ArrayList<Color>();
 	
 	public ColoredBlock() {
 	}

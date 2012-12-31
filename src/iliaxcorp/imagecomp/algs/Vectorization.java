@@ -6,7 +6,7 @@ import java.util.List;
 import iliaxcorp.imagecomp.ColoredBlock;
 import iliaxcorp.imagecomp.Image;
 
-public class Vectorization extends Alg<List<ColoredBlock>> {
+public class Vectorization extends Alg<List<ColoredBlock>, Void> {
 
 	private Image img;
 	
@@ -21,14 +21,14 @@ public class Vectorization extends Alg<List<ColoredBlock>> {
 		ColoredBlock cb = new ColoredBlock();
 		for(int i = y; i < y + blockSize; i++){
 			for(int j = x; j < x + blockSize; j++){
-				cb.block.add(img.getColorAt(j, i).val);
+				cb.block.add(img.getColorAt(j, i));
 			}
 		}
 		return cb;
 	}
 	
 	@Override
-	public List<ColoredBlock> processAlg() {
+	public List<ColoredBlock> processAlg(Void _v) {
 		int horBlocks = img.getW() / blockSize;
 		int vertBlocks = img.getH() / blockSize;
 		

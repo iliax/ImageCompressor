@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import main.Main;
+
 import iliaxcorp.imagecomp.ColoredBlock;
 import iliaxcorp.imagecomp.Image;
 import iliaxcorp.imagecomp.ImageInfo;
@@ -32,6 +34,8 @@ public class CoderAlg extends Alg<ImageInfo, Void>{
 	
 	@Override
 	public ImageInfo processAlg(Void _v) {
+		Main.print("Coding " + path);
+		
 		Image img = IOUtils.loadImage(path);
 		Vectorization v = new Vectorization(img, BLOCK_SIZE);
 		List<ColoredBlock> cbs =  v.processAlg(null);

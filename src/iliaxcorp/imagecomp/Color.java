@@ -89,4 +89,9 @@ public class Color implements Serializable {
 			rgbCalculated = true;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "[" + getRed() + ", " + getGreen() + ", " + getBlue()+"]";
+	}
 }

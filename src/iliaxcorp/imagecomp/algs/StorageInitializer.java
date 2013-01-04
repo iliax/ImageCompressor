@@ -11,14 +11,13 @@ public class StorageInitializer extends Alg<NeuronStorage, Void> {
 
 	private NeuronStorage ns = new InMemoryNeuronStorage();
 	
-	public StorageInitializer(int aNeuronCount, int blockSize) {
-		int max = 100000;
+	public StorageInitializer(int aNeuronCount) {
+		int max = 256;
 		Random rand = new Random();
 		for(int i=0; i<aNeuronCount; i++){
 			Neuron n = new Neuron();
-			
-			for(int j=0; j < blockSize*blockSize; j++){
-				n.setLinkColor(j, ( new Color((-1)*rand.nextInt(max) - 5000)));
+			for(int j=0; j < CoderAlg.BLOCK_SIZE * CoderAlg.BLOCK_SIZE; j++){
+				n.setLinkColor(j, new Color(rand.nextInt(max), rand.nextInt(max), rand.nextInt(max)));
 			}
 			
 			ns.setNeuron(i, n);

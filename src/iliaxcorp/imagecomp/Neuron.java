@@ -13,16 +13,11 @@ public class Neuron implements Serializable {
 
 	private static final int DEFAULT_LINKS_COUNT = 16;
 	
-	private List<Color> links;
+	private List<Color> links = new ArrayList<Color>(DEFAULT_LINKS_COUNT);
 	
 	private int active = 0;
 	
 	public Neuron() {
-		links = new ArrayList<Color>(DEFAULT_LINKS_COUNT);
-	}
-	
-	public Neuron(int aLinksCount){
-		links = new ArrayList<Color>(aLinksCount);
 	}
 	
 	public Color getLinkColor(int linkNumber){

@@ -1,0 +1,4 @@
+outs/*
+*/*.class
+**.class
+*.class

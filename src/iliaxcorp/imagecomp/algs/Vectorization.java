@@ -10,17 +10,15 @@ public class Vectorization extends Alg<List<ColoredBlock>, Void> {
 
 	private Image img;
 	
-	private int blockSize;
 	
-	public Vectorization(Image input,/* 4 */ int blockSizee) {
+	public Vectorization(Image input) {
 		img = input;
-		blockSize = blockSizee;
 	}
 
-	private ColoredBlock getBlock(int x, int y){
+	public static ColoredBlock getBlock(int x, int y, Image img){
 		ColoredBlock cb = new ColoredBlock();
-		for(int i = y; i < y + blockSize; i++){
-			for(int j = x; j < x + blockSize; j++){
+		for(int i = y; i < y + CoderAlg.BLOCK_SIZE; i++){
+			for(int j = x; j < x + CoderAlg.BLOCK_SIZE; j++){
 				cb.block.add(img.getColorAt(j, i));
 			}
 		}
@@ -29,16 +27,16 @@ public class Vectorization extends Alg<List<ColoredBlock>, Void> {
 	
 	@Override
 	public List<ColoredBlock> processAlg(Void _v) {
-		int horBlocks = img.getW() / blockSize;
-		int vertBlocks = img.getH() / blockSize;
+		int horBlocks = img.getW() / CoderAlg.BLOCK_SIZE;
+		int vertBlocks = img.getH() / CoderAlg.BLOCK_SIZE;
 		
 
 		List<ColoredBlock> blocks = new ArrayList<ColoredBlock>();
 		for(int i = 0; i < vertBlocks; i ++){
-			int ii = i * blockSize;
+			int ii = i * CoderAlg.BLOCK_SIZE;
 			for(int j = 0; j < horBlocks; j++){
-				int jj = j*blockSize;
-				blocks.add(getBlock(jj, ii));
+				int jj = j*CoderAlg.BLOCK_SIZE;
+				blocks.add(getBlock(jj, ii, img));
 			}
 			
 		}

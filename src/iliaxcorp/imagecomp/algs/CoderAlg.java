@@ -37,11 +37,8 @@ public class CoderAlg extends Alg<ImageInfo, Void>{
 		Main.print("Coding " + path);
 		
 		Image img = IOUtils.loadImage(path);
-		Vectorization v = new Vectorization(img, BLOCK_SIZE);
+		Vectorization v = new Vectorization(img);
 		List<ColoredBlock> cbs =  v.processAlg(null);
-		
-		DCT dct = new DCT(cbs);
-		List<ColoredBlock> cbs2 = dct.processAlg(null);
 		
 		NeuronStorage ns;
 		if(CoderAlg.ns != null){
@@ -53,7 +50,7 @@ public class CoderAlg extends Alg<ImageInfo, Void>{
 			ns.init();
 		}
 		
-		VectorQuantizer vq = new VectorQuantizer(ns, cbs2, study, L);
+		VectorQuantizer vq = new VectorQuantizer(ns, cbs, study, L);
 		P<NeuronStorage, List<Integer>> res = vq.processAlg(null);
 		
 		ns = res.a;

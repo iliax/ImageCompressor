@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Neuron implements Serializable {
 	
-	public static final int SLEEP_COUNT = 2;
+	public static final int SLEEP_COUNT = 3;
 	
 	private static final long serialVersionUID = 8492166129539633455L;
 

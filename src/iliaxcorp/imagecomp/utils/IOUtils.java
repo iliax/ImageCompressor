@@ -49,7 +49,7 @@ public class IOUtils {
 	static public void serializeJsonObject(String path, Object obj) {
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter(path));
-			String json = new Gson().toJson(obj).toString();
+			String json = new Gson().toJson(obj);
 			out.write(json);
 			out.close();
 		} catch (Exception e) {

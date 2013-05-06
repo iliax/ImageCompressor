@@ -1,5 +1,6 @@
 package iliaxcorp.imagecomp.algs;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class CoderAlg extends Alg<ImageInfo, Void>{
 	
 	@Override
 	public ImageInfo processAlg(Void _v) {
-		Main.print("Coding " + path);
+		Main.print("Coding " + path + " " + new Date());
 		
 		Image img = IOUtils.loadImage(path);
 		Vectorization v = new Vectorization(img);

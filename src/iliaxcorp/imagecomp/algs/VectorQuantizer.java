@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -48,37 +49,62 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>, Void> 
 				history.put(diff, j);
 			}
 
-			int minInx = -1;
-			boolean outerBreak = false;
-			for (List<Integer> currLst : history.values()) {
-				for (Integer indx : currLst) {
-					Neuron n = ns.getNeuronByIndex(indx);
-					if (n.getActive() == 0) {
-						minInx = indx;
-						outerBreak = true;
+			
+			if (study) {
+				
+//				int NEURON_COUNTS_FOR_STUDY = 5;
+//				Double minDiff = history.keys().iterator().next();
+//				for(Double cdiff : history.keys() ){
+//					List<Integer> nindexes = history.get(cdiff);
+//					if(NEURON_COUNTS_FOR_STUDY-- == 0){
+//						break;
+//					}
+//					for(Integer indx : nindexes){
+//						Neuron n = ns.getNeuronByIndex(indx);
+//						double ss = minDiff / cdiff;
+//						List<Color> newIndexes = new ArrayList<Color>();
+//						for (int l = 0; l < CoderAlg.BLOCK_SIZE * CoderAlg.BLOCK_SIZE; l++) {
+//							Color oldColor = n.getLinkColor(l);
+//							Color newColor = changeValue(cb.block.get(l), oldColor, (L * ss) /2);
+//							newIndexes.add(newColor);
+//						}
+//						n.setLinks(newIndexes);
+//						ns.setNeuron(indx, n);
+//					}
+//					
+//				}
+				
+				
+				int minInx = -1;
+				boolean outerBreak = false;
+				for (List<Integer> currLst : history.values()) {
+					for (Integer indx : currLst) {
+						Neuron n = ns.getNeuronByIndex(indx);
+						if (n.getActive() == 0) {
+							minInx = indx;
+							outerBreak = true;
+							break;
+						} else {
+							n.setActive(n.getActive() - 1);
+							ns.setNeuron(indx, n);
+						}
+					}
+					if (outerBreak) {
 						break;
-					} else {
-						n.setActive(n.getActive() - 1);
-						ns.setNeuron(indx, n);
 					}
 				}
-				if (outerBreak) {
-					break;
+
+				if (minInx == -1) {
+					Main.print("\n\n\nrandom minIndex choosing\n\n");
+					minInx = history.getRandomIndex();
 				}
-			}
 
-			if (minInx == -1) {
-				Main.print("\n\n\nrandom minIndex choosing\n\n");
-				minInx = history.getRandomIndex();
-			}
-
-			if (study) {
 				Neuron n = ns.getNeuronByIndex(minInx);
 				n.setActive(Neuron.SLEEP_COUNT);
 				List<Color> newIndexes = new ArrayList<Color>();
 				for (int l = 0; l < CoderAlg.BLOCK_SIZE * CoderAlg.BLOCK_SIZE; l++) {
 					Color oldColor = n.getLinkColor(l);
-					Color newColor = changeValue(cb.block.get(l), oldColor);
+					Color newColor = changeValue(cb.block.get(l), oldColor, L);
 					newIndexes.add(newColor);
 				}
 				n.setLinks(newIndexes);
@@ -92,13 +118,14 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>, Void> 
 		return new P<NeuronStorage, List<Integer>>(ns, indexes);
 	}
 
-	protected Color changeValue(Color targ, Color old) {
+	protected Color changeValue(Color targ, Color old, double ll) {
 		int d1 = targ.getRed() - old.getRed();
 		int d2 = targ.getGreen() - old.getGreen();
 		int d3 = targ.getBlue() - old.getBlue();
 
-		return new Color((int) (old.getRed() + L * d1),
-				(int) (old.getGreen() + L * d2), (int) (old.getBlue() + L * d3));
+		return new Color((int) (old.getRed() + ll * d1),
+				(int) (old.getGreen() + ll * d2), (int) (old.getBlue() + ll
+						* d3));
 	}
 
 	static public double getDiff(List<Color> links, List<Color> block) {
@@ -130,38 +157,42 @@ public class VectorQuantizer extends Alg<P<NeuronStorage, List<Integer>>, Void> 
 		private SortedMap<Double, List<Integer>> seqMap = new TreeMap<Double, List<Integer>>();
 
 		private Double lastKey = Double.MAX_VALUE;
-		
+
 		private List<Integer> get(Double key) {
 			return seqMap.get(key);
 		}
 
-		private boolean full(){
+		private boolean full() {
 			return seqMap.size() >= MAX_HISTORY_SIZE;
 		}
-		
-		public void put(Double diff, int j) {
-			
-			if(full() && diff >= lastKey){
+
+		public void put(Double diff, int numb) {
+
+			if (full() && diff >= lastKey) {
 				return;
 			}
-			
+
 			List<Integer> val = get(diff);
 			if (val == null) {
 				if (full()) {
 					seqMap.remove(lastKey);
 				}
 				ArrayList<Integer> newLst = new ArrayList<Integer>(2);
-				newLst.add(j);
+				newLst.add(numb);
 				seqMap.put(diff, newLst);
 			} else {
-				val.add(j);
+				val.add(numb);
 			}
-			
+
 			lastKey = seqMap.lastKey();
 		}
 
 		public Collection<List<Integer>> values() {
 			return seqMap.values();
+		}
+
+		public Set<Double> keys() {
+			return seqMap.keySet();
 		}
 
 		public Integer getRandomIndex() {
